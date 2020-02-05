@@ -19,6 +19,8 @@
 
 服务端
 ```c
+#include "lib/common.h"
+
 int main(int argc, char **argv)
 {
     int connfd;
@@ -51,6 +53,8 @@ int main(int argc, char **argv)
 
 客户端
 ```c
+#include "lib/common.h"
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -68,6 +72,8 @@ int main(int argc, char **argv)
 
         if (rc < 0)
             error(1, errno, "write failed");
+
+        sleep(3);
 
         rc = read(socket_fd, buf, sizeof(buf));
 
@@ -89,6 +95,8 @@ int main(int argc, char **argv)
 
 服务端
 ```c
+#include "lib/common.h"
+
 int main(int argc, char **argv)
 {
     int connfd;
@@ -114,8 +122,11 @@ int main(int argc, char **argv)
     exit(0);
 }
 ```
+
 客户端
 ```c
+#include "lib/common.h"
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {

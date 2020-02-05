@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 int main(int argc, char **argv)
 {
     if (argc != 2) {
-        error(1, 0, "usage: udpclient3 <IPaddress>");
+        error(1, 0, "usage: udpclient <IPaddress>");
     }
 
     int socket_fd;

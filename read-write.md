@@ -78,21 +78,26 @@ int main(int argc, char **argv)
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(12345);
 
-    bind(listenfd, (SA *)&servaddr, sizeof(servaddr));
+    /* bind 到本地地址，端口为 12345 */
+    bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+
+    /* listen 的 backlog 为 1024 */
     listen(listenfd, 1024);
 
     while (1) {
         clilen = sizeof(cliaddr);
-        connfd = accept(listenfd, (SA *)&cliaddr, &clilen);
+        connfd = accept(listenfd, (struct sockaddr *) &cliaddr, &clilen);
         read_data(connfd);
         close(connfd);
     }
 }
 ```
 ```c
+#include "lib/common.h"
+
 void read_data(int sockfd)
 {
-    ssize_t  n;
+    ssize_t n;
     char buf[1024];
 
     int time = 0;
@@ -117,23 +122,33 @@ int main(int argc, char **argv)
     struct sockaddr_in servaddr;
 
     if (argc != 2) {
-        err_quit("usage: tcpclient <IPaddress>");
+        error(1, 0, "usage: tcpclient <IPaddress>");
     }
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(SERV_PORT);
+    servaddr.sin_port = htons(12345);
     inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
-    connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
+
     send_data(stdin, sockfd);
+
+    int connect_rt = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+    if (connect_rt < 0) {
+        error(1, errno, "connect failed ");
+    }
+    send_data(sockfd);
+
     exit(0);
 }
 ```
 ```c
-# define MESSAGE_SIZE 10240000
+#include "lib/common.h"
 
-void send_data(FILE *fp, int sockfd)
+// 102400
+#define MESSAGE_SIZE 10240000
+
+void send_data(int sockfd)
 {
     char * query;
     query = malloc(MESSAGE_SIZE + 1);
@@ -148,10 +163,10 @@ void send_data(FILE *fp, int sockfd)
     remaining = strlen(query);
 
     while (remaining) {
-        n_written = send(sockfd, cp, remaining, 0);
+        int n_written = send(sockfd, cp, remaining, 0);
         fprintf(stdout, "send into buffer %ld \n", n_written);
         if (n_written <= 0) {
-            perror("send");
+            error(1, errno, "send failed");
             return;
         }
 
@@ -162,4 +177,3 @@ void send_data(FILE *fp, int sockfd)
     return;
 }
 ```
-

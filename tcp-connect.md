@@ -42,25 +42,30 @@ int make_socket(uint16_t port)
     int sock;
     struct sockaddr_in name;
 
+    /* 创建字节流类型的IPV4 socket */
     sock = socket(PF_INET, SOCK_STREAM, 0);
-
-    if (sock < 0)
-    {
+    if (sock < 0) {
         perror("socket");
         exit(EXIT_FAILURE);
     }
 
-    name.sin_family = AF_INET;
-    name.sin_port = htons(port);
-    name.sin_addr.s_addr = htonl(INADDR_ANY);
+    /* 绑定到 port 和 ip */
+    name.sin_family = AF_INET; /* IPV4 */
+    name.sin_port = htons(port);  /* 指定端口 */
+    name.sin_addr.s_addr = htonl(INADDR_ANY); /* 通配地址 */
 
-    if (bind(sock, (struct sockaddr *)&name, sizeof(name)) < 0)
-    {
-        perror ("bind");
+    /* 把 IPV4 地址转换成通用地址格式，同时传递长度 */
+    if (bind(sock, (struct sockaddr *) &name, sizeof(name)) < 0) {
+        perror("bind");
         exit(EXIT_FAILURE);
     }
 
     return sock;
+}
+
+int main(int argc, char **argv) {
+    int sockfd = make_socket(12345);
+    exit(0);
 }
 ```
 
@@ -376,6 +381,9 @@ TCP 保活机制默认是关闭的，可以分别在连接的两个方向上开�
 
 消息格式设计
 ```c
+#ifndef MESSAGE_OBJECTE_H
+#define MESSAGE_OBJECTE_H
+
 typedef struct {
     u_int32_t type;
     char data[1024];
@@ -385,6 +393,8 @@ typedef struct {
 #define MSG_PONG 2
 #define MSG_TYPE1 11
 #define MSG_TYPE2 21
+
+#endif
 ```
 
 客户端
@@ -433,6 +443,7 @@ int main(int argc, char **argv)
     messageObject messageObject;
 
     FD_ZERO(&allreads);
+    FD_SET(0, &allreads);
     FD_SET(socket_fd, &allreads);
 
     for (;;) {
@@ -484,6 +495,11 @@ int main(int argc, char **argv)
 
 static int count;
 
+static void sig_int(int sig) {
+    printf("\nreceived %d datagrams\n", count);
+    exit(0);
+}
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -509,6 +525,9 @@ int main(int argc, char **argv)
     if (rt2 < 0) {
         error(1, errno, "listen failed ");
     }
+
+    signal(SIGINT, sig_int);
+    signal(SIGPIPE, SIG_IGN);
 
     int connfd;
     struct sockaddr_in client_addr;

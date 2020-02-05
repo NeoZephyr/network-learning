@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
         char send_line[MAXLINE];
         sprintf(send_line, "Hi, %s", message);
         sendto(socket_fd, send_line, strlen(send_line), 0,
-            (struct sockaddr *) &client_addr, &client_len);
+            (struct sockaddr *) &client_addr, client_len);
         count++;
     }
 }
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
         }
 
         printf("now sending %s\n", send_line);
-        size_t rt = sendto(socket_fd, send_line, strlen(send_line), 0, (struct sockaddr *) &server_addr, &len);
+        size_t rt = sendto(socket_fd, send_line, strlen(send_line), 0, (struct sockaddr *) &server_addr, &server_len);
         if (rt < 0) {
             error(1, errno, "send failed ");
         }

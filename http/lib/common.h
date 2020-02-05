@@ -1,5 +1,9 @@
-#ifndef COMMON_H
-#define COMMON_H
+//
+// Created by shengym on 2019-07-07.
+//
+
+#ifndef YOLANDA_COMMON_H
+#define YOLANDA_COMMON_H
 
 #include "config.h"
 
@@ -38,6 +42,7 @@
 #include    <sys/epoll.h>
 #endif
 
+
 void err_dump(const char *, ...);
 
 void err_msg(const char *, ...);
@@ -74,4 +79,4 @@ int tcp_client(char *address, int port);
 #define    LISTENQ        1024
 #define    BUFFER_SIZE    4096
 
-#endif
+#endif //YOLANDA_COMMON_H
