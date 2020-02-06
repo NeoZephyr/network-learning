@@ -114,7 +114,6 @@ int onSocketWrite(int fd, struct Buffer *buffer) {
     return 0;
 }
 
-
 int main(int argc, char **argv)
 {
     int listen_fd;
@@ -197,6 +196,7 @@ int main(int argc, char **argv)
     }
 }
 ```
+
 客户端
 ```c
 #include "lib/common.h"

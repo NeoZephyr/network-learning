@@ -52,7 +52,6 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 3. 第三个参数是一个大于 0 的整数，表示 epoll_wait 可以返回的最大事件值
 4. 第四个参数是 epoll_wait 阻塞调用的超时值，如果这个值设置为 -1，表示不超时；如果设置为 0 则立即返回，即使没有任何 I/O 事件发生
 
-
 ```c
 #include  <sys/epoll.h>
 #include "lib/common.h"
@@ -292,5 +291,3 @@ int main(int argc, char **argv)
     close(listen_fd);
 }
 ```
-
-
